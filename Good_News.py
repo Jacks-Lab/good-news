@@ -60,7 +60,7 @@ if response.status_code == 200:
 
         # Print the filtered headlines with URLs
         for headline, url in filtered_headlines:
-            print(f"{headline}\n{url}\n")
+            print(f"—\n\n{headline}\n{url}\n")
 
     else:
         print("Error: The 'articles' key is missing in the response.")
