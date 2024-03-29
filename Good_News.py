@@ -3,6 +3,14 @@ import nltk
 import time
 from nltk.sentiment import SentimentIntensityAnalyzer
 
+# Function to calculate the positivity rating of a headline
+def positivity_rating(headline):
+    sentiment_scores = sia.polarity_scores(headline)
+    positive_score = sentiment_scores['pos']
+    negative_score = sentiment_scores['neg']
+    return (positive_score - negative_score) / (positive_score + negative_score + 1e-9)
+
+
 # Initialize the SentimentIntensityAnalyzer
 sia = SentimentIntensityAnalyzer()
 
@@ -39,27 +47,20 @@ if response.status_code == 200:
         articles = data['articles']
 
         # Extract the headlines and filter out empty strings
-        headlines = [article['title'] for article in articles if article['title']]
+        headlines = [(article['title'], article['url']) for article in articles if article['title']]
 
         # Print the number of headlines
         print(f"Number of headlines: {len(headlines)}")
 
-        # Function to calculate the positivity rating of a headline
-        def positivity_rating(headline):
-            sentiment_scores = sia.polarity_scores(headline)
-            positive_score = sentiment_scores['pos']
-            negative_score = sentiment_scores['neg']
-            return (positive_score - negative_score) / (positive_score + negative_score + 1e-9)
-
         # Filter headlines based on the positivity rating
-        filtered_headlines = [headline for headline in headlines if positivity_rating(headline) >= 0.75]
+        filtered_headlines = [(headline[0], headline[1]) for headline in headlines if positivity_rating(headline[0]) >= 0.75]
 
         # Print the number of filtered headlines
         print(f"Number of filtered headlines: {len(filtered_headlines)}")
 
-        # Print the filtered headlines
-        for headline in filtered_headlines:
-            print(headline)
+        # Print the filtered headlines with URLs
+        for headline, url in filtered_headlines:
+            print(f"{headline}\n{url}\n")
 
     else:
         print("Error: The 'articles' key is missing in the response.")
